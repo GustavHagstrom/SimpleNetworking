@@ -2,6 +2,7 @@
 
 namespace SimpleNetworking
 {
+
     public class Client : IClient
     {
         private ITcpHandler tcpHandler;
@@ -34,7 +35,7 @@ namespace SimpleNetworking
         private void OnTcpPacketReceived(object source, PacketReceivedEventArgs args)
         {
             //packetHandler.HandlePacket(args.Packet);
-            TcpPacketReceived?.Invoke(source, args);
+            TcpPacketReceived?.Invoke(this, args);
         }
 
     }

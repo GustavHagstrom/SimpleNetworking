@@ -5,9 +5,10 @@
     <Authors>Gustav Hagström</Authors>
     <Company />
     <Description>Easy setup for Server and Client connections with Tcp.</Description>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageId>SimpleTcpUdpNetworking</PackageId>
+    <Product>SimpleTcpUdpNetworking</Product>
   </PropertyGroup>
 
 </Project>
