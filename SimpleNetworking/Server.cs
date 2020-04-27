@@ -6,13 +6,23 @@ using System.Text;
 
 namespace SimpleNetworking
 {
-    public delegate void ClientConnectedToServerEventHandler(object source, ClientConnectedToServerEventArgs args);
-    public class ClientConnectedToServerEventArgs : EventArgs
+    public delegate void ClientConnectionChangedEventHandler(object source, ClientConnectionEventArgs args);
+    
+    public class ClientConnectionEventArgs : EventArgs
     {
+        public enum ConnectionStatus
+        {
+            Connected,
+            Disconnected
+        }
         public IClient Client { get; }
-        public ClientConnectedToServerEventArgs(IClient client)
+        public ConnectionStatus Status { get; }
+        public ClientConnectionEventArgs(IClient client, ConnectionStatus status)
         {
             Client = client;
+            Status = status;
+
+
         }
     }
 
@@ -25,7 +35,7 @@ namespace SimpleNetworking
         public int MaxConnections { get; private set; }
         public int Port { get; private set; }
         public Dictionary<int, IClient> Clients { get; private set; }
-        public event ClientConnectedToServerEventHandler ClientConnectedToServer;
+        public event ClientConnectionChangedEventHandler ClientConnectionChanged;
 
 
         public Server(IPacketHandler packetHandler, int maxConnections, int port)
@@ -67,11 +77,13 @@ namespace SimpleNetworking
             client.Id = idCounter;
             Clients.Add(idCounter, client);
             idCounter += 1;
-            ClientConnectedToServer?.Invoke(this, new ClientConnectedToServerEventArgs(client));
+            ClientConnectionChanged?.Invoke(this, new ClientConnectionEventArgs(client, ClientConnectionEventArgs.ConnectionStatus.Connected));
         }
         private void RemoveClient(int id)
         {
+            var client = Clients[id];
             Clients.Remove(id);
+            ClientConnectionChanged?.Invoke(this, new ClientConnectionEventArgs(client, ClientConnectionEventArgs.ConnectionStatus.Connected));
         }
     }
 }

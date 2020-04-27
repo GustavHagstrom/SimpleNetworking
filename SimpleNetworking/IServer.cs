@@ -5,7 +5,7 @@ namespace SimpleNetworking
     public interface IServer
     {
         Dictionary<int, IClient> Clients { get; }
-        event ClientConnectedToServerEventHandler ClientConnectedToServer;
+        event ClientConnectionChangedEventHandler ClientConnectionChanged;
         int MaxConnections { get; }
         int Port { get; }
 
