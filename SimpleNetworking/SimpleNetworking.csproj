@@ -7,10 +7,7 @@
     <Description>Easy setup for Server and Client connections with Tcp.</Description>
     <Version>0.1.0</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageId>SimpleTcpUdpNetworking</PackageId>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Serilog" Version="2.9.0" />
-  </ItemGroup>
 
 </Project>

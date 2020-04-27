@@ -63,7 +63,7 @@ namespace SimpleNetworking
         }
         private void AddClient(TcpClient tcpClient)
         {
-            Client client = new Client(new TcpHandler(tcpClient), packetHandler);
+            Client client = new Client(new TcpHandler(tcpClient));
             client.Id = idCounter;
             Clients.Add(idCounter, client);
             idCounter += 1;

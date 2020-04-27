@@ -5,16 +5,16 @@ namespace SimpleNetworking
     public class Client : IClient
     {
         private ITcpHandler tcpHandler;
-        private IPacketHandler packetHandler;
+        //private IPacketHandler packetHandler;
 
         public int Id { get; set; } = 0;
-        //public event TcpPacketReceivedEventHandler TcpPacketReceived;
+        public event TcpPacketReceivedEventHandler TcpPacketReceived;
         public event TcpConnectionEstablishedEventHandler TcpConnectionEstablished;
 
-        public Client(ITcpHandler tcpHandler, IPacketHandler packetHandler)
+        public Client(ITcpHandler tcpHandler)//, IPacketHandler packetHandler)
         {
             this.tcpHandler = tcpHandler;
-            this.packetHandler = packetHandler;
+            //this.packetHandler = packetHandler;
             tcpHandler.TcpConnectionEstablished += OnTcpConnectionEstablished;
             tcpHandler.TcpPacketReceived += OnTcpPacketReceived;
         }
@@ -33,8 +33,8 @@ namespace SimpleNetworking
         }
         private void OnTcpPacketReceived(object source, PacketReceivedEventArgs args)
         {
-            packetHandler.HandlePacket(args.Packet);
-            //TcpPacketReceived?.Invoke(source, args);
+            //packetHandler.HandlePacket(args.Packet);
+            TcpPacketReceived?.Invoke(source, args);
         }
 
     }
