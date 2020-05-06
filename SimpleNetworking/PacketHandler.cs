@@ -2,7 +2,7 @@
 
 namespace SimpleNetworking
 {
-    public delegate void PacketHandlerMethod(Packet packet);
+    public delegate void PacketHandlerMethod(IPacket packet, int clientId);
     public class PacketHandler : IPacketHandler
     {
         private Dictionary<int, PacketHandlerMethod> handlerMap;
@@ -10,9 +10,9 @@ namespace SimpleNetworking
         {
             this.handlerMap = handlerMap;
         }
-        public void HandlePacket(Packet packet)
+        public void HandlePacket(IPacket packet, int clientId)
         {
-            handlerMap[packet.PacketTypeId](packet);
+            handlerMap[packet.PacketTypeId](packet, clientId);
         }
     }
 }

@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.console" Version="2.4.1">
       <PrivateAssets>all</PrivateAssets>
@@ -18,6 +19,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SimpleNetworking\SimpleNetworking.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Helpers\" />
   </ItemGroup>
 
 </Project>

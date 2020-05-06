@@ -4,58 +4,117 @@ using System.Linq;
 
 namespace SimpleNetworking
 {
-    
+
     public class Packet : IPacket
     {
-        private List<byte> buffer;
+        private const int HEADERSOFFSET = 4 + 8 + 8 + 4;
+        private byte[] headers = new byte[HEADERSOFFSET];
+        private byte[] data = new byte[0];
 
         public int PacketTypeId
         {
             get
             {
-                return BitConverter.ToInt32(buffer.Take(4).ToArray());
+                int offset = 0;
+                int length = 4;
+                return BitConverter.ToInt32(headers.Skip(offset).Take(length).ToArray());
+            }
+            set
+            {
+                int offset = 0;
+                byte[] newBytes = BitConverter.GetBytes(value);
+                for(int i = 0; i < newBytes.Length; i++)
+                {
+                    headers[i+offset] = newBytes[i];
+                }
+            }
+        }
+        public DateTime Sent
+        {
+            get
+            {
+                int offset = 4;
+                int length = 8;
+                byte[] bytes = headers.Skip(offset).Take(length).ToArray();
+                long serializedDateTime = BitConverter.ToInt64(bytes);
+                return DateTime.FromBinary(serializedDateTime);
+            }
+            set
+            {
+                int offset = 4;
+                byte[] newBytes = BitConverter.GetBytes(value.ToBinary());
+                for (int i = 0; i < newBytes.Length; i++)
+                {
+                    headers[i + offset] = newBytes[i];
+                }
+            }
+        }
+        public DateTime Received
+        {
+            get
+            {
+                int offset = 4 + 8;
+                int length = 8;
+                byte[] bytes = headers.Skip(offset).Take(length).ToArray();
+                long serializedDateTime = BitConverter.ToInt64(bytes);
+                return DateTime.FromBinary(serializedDateTime);
+            }
+            set
+            {
+                int offset = 4 + 8;
+                byte[] newBytes = BitConverter.GetBytes(value.ToBinary());
+                for (int i = 0; i < newBytes.Length; i++)
+                {
+                    headers[i + offset] = newBytes[i];
+                }
+            }
+        }
+        public int ClientId
+        {
+            get
+            {
+                int offset = 4 + 8 + 8;
+                int length = 4;
+                return BitConverter.ToInt32(headers.Skip(offset).Take(length).ToArray());
+            }
+            set
+            {
+                int offset = 4 + 8 + 8;
+                byte[] newBytes = BitConverter.GetBytes(value);
+                for (int i = 0; i < newBytes.Length; i++)
+                {
+                    headers[i + offset] = newBytes[i];
+                }
             }
         }
         public byte[] Data
         {
             get
             {
-                return buffer.Skip(4).ToArray();
+                return data;
+            }
+            set
+            {
+                data = value;
             }
         }
-        public byte[] Binarys
+        public byte[] Bytes
         {
             get
             {
-                return buffer.ToArray();
+                return headers.Concat(data).ToArray();
             }
         }
+        public Packet()
+        {
+            //data = new List<byte>();
+        }
+        public void SetContentFromReceivedBytes(byte[] data)
+        {
+            this.headers = data.Take(HEADERSOFFSET).ToArray();
+            this.data = data.Skip(HEADERSOFFSET).ToArray();
+        }
 
-        private Packet()
-        {
-            buffer = new List<byte>();
-        }
-        public static Packet FromReceivedBytes(byte[] data)
-        {
-            Packet packet = new Packet();
-            packet.Write(data);
-            return packet;
-        }
-        public static Packet NewPacket(int packetIdType, byte[] data)
-        {
-            Packet packet = new Packet();
-            packet.Write(packetIdType);
-            packet.Write(data);
-            return packet;
-        }
-        private void Write(byte[] data)
-        {
-            buffer.AddRange(data);
-        }
-        private void Write(int id)
-        {
-            buffer.AddRange(BitConverter.GetBytes(id));
-        }
 
 
     }

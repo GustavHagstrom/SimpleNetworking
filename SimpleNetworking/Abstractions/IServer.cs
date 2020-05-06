@@ -4,12 +4,11 @@ namespace SimpleNetworking
 {
     public interface IServer
     {
-        Dictionary<int, IClient> Clients { get; }
-        event ClientConnectionChangedEventHandler ClientConnectionChanged;
+        List<IServerClient> Clients { get; }
         int MaxConnections { get; }
         int Port { get; }
-
-        void Start();
+        Queue<IPacket> ReceivedPackets { get; }
+        void Start(int maxConnections, int port);
         void Stop();
     }
 }

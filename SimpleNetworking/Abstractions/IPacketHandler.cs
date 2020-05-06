@@ -2,6 +2,6 @@
 {
     public interface IPacketHandler
     {
-        void HandlePacket(Packet packet);
+        void HandlePacket(IPacket packet, int clientId);
     }
 }

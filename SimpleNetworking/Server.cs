@@ -1,57 +1,38 @@
-﻿using System;
+﻿using SimpleNetworking.DI;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace SimpleNetworking
 {
-    public delegate void ClientConnectionChangedEventHandler(object source, ClientConnectionEventArgs args);
     
-    public class ClientConnectionEventArgs : EventArgs
-    {
-        public enum ConnectionStatus
-        {
-            Connected,
-            Disconnected
-        }
-        public IClient Client { get; }
-        public ConnectionStatus Status { get; }
-        public ClientConnectionEventArgs(IClient client, ConnectionStatus status)
-        {
-            Client = client;
-            Status = status;
-
-
-        }
-    }
 
     public class Server : IServer
     {
         private TcpListener tcpListener;
-        private int idCounter = 1;
-        private IPacketHandler packetHandler;
+        //private int idCounter = 1;
 
         public int MaxConnections { get; private set; }
         public int Port { get; private set; }
-        public Dictionary<int, IClient> Clients { get; private set; }
-        public event ClientConnectionChangedEventHandler ClientConnectionChanged;
+        //public Dictionary<int, IServerClient> Clients { get; private set; } = new Dictionary<int, IServerClient>();
+        public List<IServerClient> Clients { get; private set; } = new List<IServerClient>();
+        public Queue<IPacket> ReceivedPackets { get; private set; } = new Queue<IPacket>();
 
 
-        public Server(IPacketHandler packetHandler, int maxConnections, int port)
+        public Server()
         {
-            this.packetHandler = packetHandler;
+
+        }
+       
+
+        public void Start(int maxConnections, int port)
+        {
             MaxConnections = maxConnections;
             Port = port;
-            Clients = new Dictionary<int, IClient>();
             tcpListener = new TcpListener(IPAddress.Any, Port);
-        }
-
-        public void Start()
-        {
             tcpListener.Start();
             tcpListener.BeginAcceptTcpClient(TcpConnectionCallback, null);
-            //tcpListener.BeginAcceptTcpClient(new AsyncCallback(TcpConnectionCallback), null);
         }
         public void Stop()
         {
@@ -61,29 +42,48 @@ namespace SimpleNetworking
         {
             TcpClient tcpClient = tcpListener.EndAcceptTcpClient(result);
             tcpListener.BeginAcceptTcpClient(TcpConnectionCallback, null);
-            //tcpListener.BeginAcceptTcpClient(new AsyncCallback(TcpConnectionCallback), null);
 
             if (Clients.Count >= MaxConnections)
             {
                 return;
             }
             AddClient(tcpClient);
-            
-
         }
         private void AddClient(TcpClient tcpClient)
         {
-            Client client = new Client(new TcpHandler(tcpClient));
-            client.Id = idCounter;
-            Clients.Add(idCounter, client);
-            idCounter += 1;
-            ClientConnectionChanged?.Invoke(this, new ClientConnectionEventArgs(client, ClientConnectionEventArgs.ConnectionStatus.Connected));
+            int id = tcpClient.Client.RemoteEndPoint.GetHashCode();
+            string ip = tcpClient.Client.RemoteEndPoint.ToString();
+            if (Clients.Find(c => c.Id == id) == null)
+            {
+                IServerClient client = ServiceLocator.Instance.Get<IServerClient>();
+                client.Id = id;
+                client.Ip = ip;
+                client.Tcp.HandleReceivedPacket = OnClientReceivedPacket;
+                client.Tcp.SetConnectedTcpClient(tcpClient);
+                Clients.Add(client);
+            }
+            else
+            {
+                IServerClient client = Clients.Find(c => c.Id == id);
+                client.Tcp.HandleReceivedPacket = OnClientReceivedPacket;
+                client.Tcp.SetConnectedTcpClient(tcpClient);
+            }
+            
+            //idCounter += 1;
         }
-        private void RemoveClient(int id)
+        private void AddClient(UdpClient udpClient)
         {
-            var client = Clients[id];
-            Clients.Remove(id);
-            ClientConnectionChanged?.Invoke(this, new ClientConnectionEventArgs(client, ClientConnectionEventArgs.ConnectionStatus.Connected));
+            throw new NotImplementedException();
         }
+        private void RemoveClient(int clientId)
+        {
+            Clients.Remove(Clients.Find(c => c.Id == clientId));
+            //Clients.Remove(clientId);
+        }        
+        private void OnClientReceivedPacket(IPacket packet)
+        {
+            ReceivedPackets.Enqueue(packet);
+        }
+        
     }
 }
