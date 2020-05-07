@@ -5,17 +5,15 @@
     <Authors>Gustav Hagström</Authors>
     <Company />
     <Description>Easy setup for Server and Client connections with Tcp.</Description>
-    <Version>0.1.2</Version>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Version>0.2.1</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>SimpleTcpUdpNetworking</PackageId>
     <Product>SimpleTcpUdpNetworking</Product>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="5.1.4" />
-    <PackageReference Include="Serilog" Version="2.9.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
-    <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />
+    <Folder Include="Abstractions\" />
   </ItemGroup>
 
 </Project>

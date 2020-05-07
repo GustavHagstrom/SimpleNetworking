@@ -6,6 +6,8 @@ Maybe
 .vs
 .publish
 
+#Generated Nuget package
+*.nupkg
 
 # Compiled source #
 ###################
