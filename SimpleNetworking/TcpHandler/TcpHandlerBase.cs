@@ -1,37 +1,83 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Sockets;
 
 namespace SimpleNetworking
 {
-
- 
-    public class TcpHandlerBase : ITcpHandlerBase
+    public abstract class TcpHandlerBase : IDisposable
     {
-        protected NetworkStream stream;
-        protected byte[] receiveBuffer;
-        protected TcpClient socket = new TcpClient();
+        protected TcpClient socket;
 
-        
+        public bool IsConnected
+        {
+            get
+            {
+                if (socket == null)
+                {
+                    return false;
+                }
+                return socket.Connected;
+            }
+        }
         public int DataBufferSize { get; set; } = 4096; // Bad if user changes this mid connection
-        public bool IsConnected => socket.Connected;
-
-        internal event PacketReceivedEventHandler PacketReceived; //ok
-        internal event DisconnectedEventHandler Disconnected; //ok
-        internal event ConnectedEventHandler Connected; //ok
-
         public TcpHandlerBase()
         {
 
         }
 
+        internal event DisconnectedEventHandler Disconnected; //ok
+        internal event ConnectedEventHandler Connected; //ok
+        internal event PacketReceivedEventHandler PacketReceived; //ok
+
         public void Disconnect()
         {
-            socket.Close();
+            Dispose();
         }
-        public void Send(IPacket packet)
+        public void Send(Packet packet)
         {
             packet.Sent = DateTime.Now;
-            stream.Write(packet.Bytes, 0, packet.Bytes.Length);
+
+            byte[] packetLength = BitConverter.GetBytes(packet.AllBytes.Length);
+            byte[] bytesToSend = packetLength.Concat(packet.AllBytes).ToArray();
+            try
+            {
+                socket.GetStream().BeginWrite(bytesToSend, 0, bytesToSend.Length, null, null);
+            }
+            catch (Exception e)
+            {
+                //throw e;
+                Dispose();
+                Disconnected?.Invoke(e, ProtocolType.Tcp, 0);
+            }
+        }
+        protected void BeginReadingNetworkStream(StateObject state)
+        {
+            try
+            {
+                socket.GetStream().BeginRead(state.Buffer, 0, DataBufferSize, new AsyncCallback(ReceiveCallback), state);
+            }
+            catch (Exception e)
+            {
+                //throw e;
+                Dispose();
+                Disconnected?.Invoke(e, ProtocolType.Tcp, 0);
+            }
+        }
+        protected void ReceiveCallback(IAsyncResult result)
+        {
+            StateObject state = (StateObject)result.AsyncState;
+            int byteLength = socket.GetStream().EndRead(result);
+
+            if (state.Resolve(byteLength))
+            {
+                Packet packet = new Packet { AllBytes = state.Data, Received = DateTime.Now };
+                PacketReceived?.Invoke(packet);
+
+                byte[] rest = state.RestData;
+                state = new StateObject(DataBufferSize) { Data = rest };
+            }
+
+            BeginReadingNetworkStream(state);
         }
         protected void ConnectCallback(IAsyncResult result)
         {
@@ -41,36 +87,18 @@ namespace SimpleNetworking
             {
                 return;
             }
-            stream = socket.GetStream();
-            Connected?.Invoke(ConnectionProtocolType.Tcp, 0);
-            StartReadingNetworkStream();            
-        }
-        protected void ReceiveCallback(IAsyncResult result)
-        {
-            int byteLength = stream.EndRead(result);
-            if (byteLength <= 0)
-            {
-                return;
-            }
-            byte[] data = new byte[byteLength];
-            Array.Copy(receiveBuffer, data, byteLength);
-            StartReadingNetworkStream();
+            Connected?.Invoke(ProtocolType.Tcp, 0);
 
-            Packet packet = new Packet();
-            packet.SetContentFromReceivedBytes(data);
-            packet.Received = DateTime.Now;
-            PacketReceived?.Invoke(packet);
+            this.BeginReadingNetworkStream(new StateObject(DataBufferSize));
         }
-        protected void StartReadingNetworkStream()
+        public void Dispose()
         {
-            try
-            {
-                stream.BeginRead(receiveBuffer, 0, DataBufferSize, ReceiveCallback, null);
-            }
-            catch (Exception e)
-            {
-                Disconnected?.Invoke(e, ConnectionProtocolType.Tcp, 0);
-            }
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+            socket.Dispose();
         }
     }
 }

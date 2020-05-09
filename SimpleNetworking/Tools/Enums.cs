@@ -4,14 +4,5 @@ using System.Text;
 
 namespace SimpleNetworking
 {
-    public enum ConnectionStatus
-    {
-        Connected,
-        Disconnected
-    }
-    public enum ConnectionProtocolType
-    {
-        Tcp,
-        Udp
-    }
+    
 }

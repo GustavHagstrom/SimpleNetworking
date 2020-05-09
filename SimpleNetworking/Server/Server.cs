@@ -59,7 +59,7 @@ namespace SimpleNetworking
             ServerClient client = Clients.Find(c => c.Id == id);
             if (client == null)
             {
-                client = new ServerClient();
+                client = new ServerClient(this);
                 client.Id = id;
                 client.Ip = ip;
                 client.PacketReceived += OnClientReceivedPacket;
@@ -86,11 +86,11 @@ namespace SimpleNetworking
             ReceivedPackets.Enqueue(packet);
         }
 
-        private void OnClientDisconnected(Exception e, ConnectionProtocolType type, int clientId)
+        private void OnClientDisconnected(Exception e, ProtocolType type, int clientId)
         {
             ClientDisconnected?.Invoke(e, type, clientId);
         }
-        private void OnClientConnected(ConnectionProtocolType type, int clientId)
+        private void OnClientConnected(ProtocolType type, int clientId)
         {
             ClientConnected?.Invoke(type, clientId);
         }

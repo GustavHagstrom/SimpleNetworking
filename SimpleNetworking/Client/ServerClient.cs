@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Net.Sockets;
 
 namespace SimpleNetworking
 {
-    public class ServerClient : ClientBase, IServerClient
+    public class ServerClient : ClientBase
     {
         private ServerClientTcpHandler tcp;
 
@@ -25,24 +26,26 @@ namespace SimpleNetworking
         }
         public string Ip { get; set; } = string.Empty;
 
+        internal Server server;
         internal event PacketReceivedEventHandler PacketReceived;
         internal event DisconnectedEventHandler Disconnected;
         internal event ConnectedEventHandler Connected;
 
-        public ServerClient()
+        public ServerClient(Server server) : base()
         {
             Tcp = new ServerClientTcpHandler();
+            this.server = server;
         }
         private void OnPacketReceived(IPacket packet)
         {
             packet.ClientId = Id;
             PacketReceived?.Invoke(packet);
         }
-        private void OnTcpDisconnected(Exception e, ConnectionProtocolType type, int clientId)
+        private void OnTcpDisconnected(Exception e, ProtocolType type, int clientId)
         {
             Disconnected?.Invoke(e, type, this.Id);
         }
-        private void OnTcpConnected(ConnectionProtocolType type, int clientId)
+        private void OnTcpConnected(ProtocolType type, int clientId)
         {
             Connected?.Invoke(type, this.Id);
         }

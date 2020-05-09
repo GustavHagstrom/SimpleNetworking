@@ -1,26 +1,22 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Linq;
+using System.Net.Sockets;
 
 namespace SimpleNetworking
 {
 
-    public class ServerClientTcpHandler : TcpHandlerBase, IServerClientTcpHandler
+    public sealed class ServerClientTcpHandler : TcpHandlerBase
     {
-        public ServerClientTcpHandler()
+        public ServerClientTcpHandler() : base()
         {
 
         }
+
         public void SetConnectedTcpClient(TcpClient client)
         {
             socket = client;
-            SetupConnectedTcpClient(client);
-        }
-        private void SetupConnectedTcpClient(TcpClient client)
-        {
-            receiveBuffer = new byte[DataBufferSize];
-            stream = socket.GetStream();
-            this.StartReadingNetworkStream();
-        }
-        
 
+            this.BeginReadingNetworkStream(new StateObject(DataBufferSize));
+        }
     }
 }

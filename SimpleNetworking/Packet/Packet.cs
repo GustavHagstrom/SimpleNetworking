@@ -7,7 +7,8 @@ namespace SimpleNetworking
 
     public class Packet : IPacket
     {
-        private const int HEADERSOFFSET = 4 + 8 + 8 + 4;
+        public const int HEADERSOFFSET = 4 + 8 + 8 + 4;
+
         private byte[] headers = new byte[HEADERSOFFSET];
         private byte[] data = new byte[0];
 
@@ -98,21 +99,22 @@ namespace SimpleNetworking
                 data = value;
             }
         }
-        public byte[] Bytes
+        public byte[] AllBytes
         {
             get
             {
+                //PacketLength = headers.Length + data.Length;
                 return headers.Concat(data).ToArray();
+            }
+            set
+            {
+                this.headers = value.Take(HEADERSOFFSET).ToArray();
+                this.data = value.Skip(HEADERSOFFSET).ToArray();
             }
         }
         public Packet()
         {
             //data = new List<byte>();
-        }
-        public void SetContentFromReceivedBytes(byte[] data)
-        {
-            this.headers = data.Take(HEADERSOFFSET).ToArray();
-            this.data = data.Skip(HEADERSOFFSET).ToArray();
         }
 
 

@@ -26,19 +26,22 @@ namespace SimpleNetworking.Tests.Tests
 
             };
             Packet secondPacket = new Packet();
-            secondPacket.SetContentFromReceivedBytes(firstPacket.Bytes);
+            secondPacket.AllBytes = firstPacket.AllBytes;
+            int expectedPacketLength = firstPacket.AllBytes.Length;
 
             Assert.Equal(expectedData, firstPacket.Data);
             Assert.Equal(expectedPacketId, firstPacket.PacketTypeId);
             Assert.Equal(expectedReceivedTime, firstPacket.Received);
             Assert.Equal(expectedSentTime, firstPacket.Sent);
             Assert.Equal(expectedClientId, firstPacket.ClientId);
+            Assert.Equal(expectedPacketLength, firstPacket.AllBytes.Length);
 
             Assert.Equal(expectedData, secondPacket.Data);
             Assert.Equal(expectedPacketId, secondPacket.PacketTypeId);
             Assert.Equal(expectedReceivedTime, secondPacket.Received);
             Assert.Equal(expectedSentTime, secondPacket.Sent);
             Assert.Equal(expectedClientId, secondPacket.ClientId);
+            Assert.Equal(expectedPacketLength, secondPacket.AllBytes.Length);
         }
 
     }

@@ -1,11 +1,12 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Net.Sockets;
 
 namespace SimpleNetworking
 {
 
-    public class UserClientTcpHandler : TcpHandlerBase, IUserClientTcpHandler
+    public class UserClientTcpHandler : TcpHandlerBase
     {
-        public UserClientTcpHandler()
+        public UserClientTcpHandler() : base()
         {
             
         }
@@ -16,9 +17,9 @@ namespace SimpleNetworking
                 ReceiveBufferSize = DataBufferSize,
                 SendBufferSize = DataBufferSize
             };
-            receiveBuffer = new byte[DataBufferSize];
 
             socket.BeginConnect(host, port, ConnectCallback, null);
         }
+        
     }
 }

@@ -1,24 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 
 namespace SimpleNetworking
 {
-    public class ClientDisconnectedEventArgs : EventArgs
-    {
-        public Exception Error { get; private set; }
-        public int ClientId { get; private set; }
-        public ClientDisconnectedEventArgs(Exception error, int clientId)
-        {
-            Error = error;
-            ClientId = clientId;
-        }
-    }
-
-    public class UserClient : IUserClient
+    public class UserClient : ClientBase
     {
         private UserClientTcpHandler tcp;
 
-        public int Id { get; set; } = 0;
+
         public UserClientTcpHandler Tcp
         {
             get => tcp;
@@ -41,7 +31,7 @@ namespace SimpleNetworking
         public event DisconnectedEventHandler Disconnected;
         public event ConnectedEventHandler Connected;
 
-        public UserClient()
+        public UserClient() : base()
         {
             Tcp = new UserClientTcpHandler();
         }
@@ -51,11 +41,11 @@ namespace SimpleNetworking
             packet.ClientId = Id;
             ReceivedPackets.Enqueue(packet);
         }
-        private void OnTcpDisconnected(Exception e, ConnectionProtocolType type, int clientId)
+        private void OnTcpDisconnected(Exception e, ProtocolType type, int clientId)
         {
             Disconnected?.Invoke(e, type, this.Id);
         }
-        private void OnTcpConnected(ConnectionProtocolType type, int clientId)
+        private void OnTcpConnected(ProtocolType type, int clientId)
         {
             Connected?.Invoke(type, this.Id);
         }
