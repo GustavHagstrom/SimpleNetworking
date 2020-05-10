@@ -14,7 +14,6 @@ namespace SimpleNetworking
         public event DisconnectedEventHandler ClientDisconnected;
         public event ConnectedEventHandler ClientConnected;
 
-        //private int idCounter = 1;
 
         public int MaxConnections { get; private set; }
         public int Port { get; private set; }
@@ -79,6 +78,8 @@ namespace SimpleNetworking
         }
         private void RemoveClient(int clientId)
         {
+            ServerClient client = Clients.Find(c => c.Id == clientId);
+            client.Dispose();
             Clients.Remove(Clients.Find(c => c.Id == clientId));
         }        
         private void OnClientReceivedPacket(IPacket packet)

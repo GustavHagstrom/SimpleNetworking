@@ -49,6 +49,14 @@ namespace SimpleNetworking
         {
             Connected?.Invoke(type, this.Id);
         }
+        public override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Tcp.Dispose();
+                //TODO dispose Udp
+            }
+        }
 
     }
 }

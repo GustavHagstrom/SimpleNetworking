@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace SimpleNetworking
 {
     public abstract class TcpHandlerBase : IDisposable
     {
+
         protected TcpClient socket;
+        private List<byte> receivedUnhandledBytes = new List<byte>();
 
         public bool IsConnected
         {
@@ -41,7 +45,9 @@ namespace SimpleNetworking
             byte[] bytesToSend = packetLength.Concat(packet.AllBytes).ToArray();
             try
             {
-                socket.GetStream().BeginWrite(bytesToSend, 0, bytesToSend.Length, null, null);
+                //socket.GetStream().BeginWrite(bytesToSend, 0, bytesToSend.Length, new AsyncCallback(WriteCallback), null);
+                socket.GetStream().Write(bytesToSend);
+                Thread.Sleep(1);
             }
             catch (Exception e)
             {
@@ -50,6 +56,10 @@ namespace SimpleNetworking
                 Disconnected?.Invoke(e, ProtocolType.Tcp, 0);
             }
         }
+        //protected void WriteCallback(IAsyncResult result)
+        //{
+        //    socket.GetStream().EndWrite(result);
+        //}
         protected void BeginReadingNetworkStream(StateObject state)
         {
             try
@@ -65,19 +75,31 @@ namespace SimpleNetworking
         }
         protected void ReceiveCallback(IAsyncResult result)
         {
-            StateObject state = (StateObject)result.AsyncState;
             int byteLength = socket.GetStream().EndRead(result);
+            BeginReadingNetworkStream(new StateObject(DataBufferSize));
 
-            if (state.Resolve(byteLength))
+            StateObject state = (StateObject)result.AsyncState;
+            receivedUnhandledBytes.AddRange(state.Buffer.Take(byteLength));
+
+            Packet packet = HandleReceivedBytes();
+            if (packet != null)
             {
-                Packet packet = new Packet { AllBytes = state.Data, Received = DateTime.Now };
                 PacketReceived?.Invoke(packet);
-
-                byte[] rest = state.RestData;
-                state = new StateObject(DataBufferSize) { Data = rest };
             }
 
-            BeginReadingNetworkStream(state);
+            //StateObject state = (StateObject)result.AsyncState;
+            //int byteLength = socket.GetStream().EndRead(result);
+
+            //if (state.Resolve(byteLength))
+            //{
+            //    Packet packet = new Packet { AllBytes = state.Data, Received = DateTime.Now };
+            //    PacketReceived?.Invoke(packet);
+
+            //    byte[] rest = state.RestData;
+            //    state = new StateObject(DataBufferSize) { Data = rest };
+            //}
+
+            //BeginReadingNetworkStream(state);
         }
         protected void ConnectCallback(IAsyncResult result)
         {
@@ -99,6 +121,28 @@ namespace SimpleNetworking
         protected virtual void Dispose(bool disposing)
         {
             socket.Dispose();
+        }
+        private Packet HandleReceivedBytes()
+        {
+            int receivedLength = receivedUnhandledBytes.Count;
+            if (receivedLength <= 4)
+            {
+                return null;
+            }
+
+            int packetLength = BitConverter.ToInt32(receivedUnhandledBytes.Take(4).ToArray());
+            if (receivedLength < packetLength + 4)
+            {
+                return null;
+            }
+
+            Packet packet = new Packet
+            {
+                AllBytes = receivedUnhandledBytes.Skip(4).Take(packetLength).ToArray(),
+                Received = DateTime.Now,
+            };
+            receivedUnhandledBytes.RemoveRange(0, packetLength + 4);
+            return packet;
         }
     }
 }

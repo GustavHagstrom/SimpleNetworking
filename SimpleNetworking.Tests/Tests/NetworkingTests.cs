@@ -28,15 +28,19 @@ namespace SimpleNetworking.Tests.Tests
 
             server.StartListening(maxCnn, port);
             userClient.Tcp.Connect(host, port);
-            Thread.Sleep(5 * 1000);
+            Thread.Sleep(4 * 1000);
             userClient.Tcp.Send(expectedPacket);
             server.Clients.First().Tcp.Send(expectedPacket);
-            Thread.Sleep(5 * 1000);
+            server.Clients.First().Tcp.Send(expectedPacket);
+            server.Clients.First().Tcp.Send(expectedPacket);
+            server.Clients.First().Tcp.Send(expectedPacket);
+            Thread.Sleep(100);
 
             Assert.True(userClient.Tcp.IsConnected);
             Assert.True(server.Clients.First().Tcp.IsConnected);
             Assert.Equal(server.ReceivedPackets.Peek().Data, userClient.ReceivedPackets.Peek().Data);
             Assert.Equal(server.ReceivedPackets.Peek().PacketTypeId, userClient.ReceivedPackets.Peek().PacketTypeId);
+            Assert.Equal(4, userClient.ReceivedPackets.Count);
 
         }
     }
