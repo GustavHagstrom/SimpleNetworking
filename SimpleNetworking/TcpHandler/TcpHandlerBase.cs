@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -9,7 +10,7 @@ namespace SimpleNetworking
     public abstract class TcpHandlerBase : IDisposable
     {
 
-        protected TcpClient socket;
+        internal TcpClient socket;
         private List<byte> receivedUnhandledBytes = new List<byte>();
 
         public bool IsConnected
@@ -84,7 +85,7 @@ namespace SimpleNetworking
             Packet packet = HandleReceivedBytes();
             if (packet != null)
             {
-                PacketReceived?.Invoke(packet);
+                PacketReceived?.Invoke(packet, ProtocolType.Tcp);
             }
 
             //StateObject state = (StateObject)result.AsyncState;
@@ -109,7 +110,8 @@ namespace SimpleNetworking
             {
                 return;
             }
-            Connected?.Invoke(ProtocolType.Tcp, 0);
+            ConnectionMade();
+            //Connected?.Invoke(((IPEndPoint)socket.Client.RemoteEndPoint).Address, ProtocolType.Tcp, 0);
 
             this.BeginReadingNetworkStream(new StateObject(DataBufferSize));
         }
@@ -143,6 +145,10 @@ namespace SimpleNetworking
             };
             receivedUnhandledBytes.RemoveRange(0, packetLength + 4);
             return packet;
+        }
+        protected void ConnectionMade()
+        {
+            Connected?.Invoke(((IPEndPoint)socket.Client.RemoteEndPoint).Address, ProtocolType.Tcp, 0);
         }
     }
 }

@@ -5,16 +5,15 @@
     <Authors>Gustav Hagström</Authors>
     <Company />
     <Description>Easy setup for Server and Client connections with Tcp.</Description>
-    <Version>0.2.2</Version>
+    <Version>0.2.3.2</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>SimpleTcpUdpNetworking</PackageId>
     <Product>SimpleTcpUdpNetworking</Product>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <RepositoryType></RepositoryType>
+    <PackageTags>tcp udp networking</PackageTags>
+    <PackageProjectUrl>https://github.com/GustavHagstrom/SimpleNetworking</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/GustavHagstrom/SimpleNetworking</RepositoryUrl>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Folder Include="Client\Abstractions\" />
-    <Folder Include="TcpHandler\Abstractions\" />
-  </ItemGroup>
 
 </Project>

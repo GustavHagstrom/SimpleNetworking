@@ -21,8 +21,4 @@
     <ProjectReference Include="..\SimpleNetworking\SimpleNetworking.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Helpers\" />
-  </ItemGroup>
-
 </Project>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Sockets;
 
 namespace SimpleNetworking
@@ -6,11 +7,15 @@ namespace SimpleNetworking
 
     public class UserClientTcpHandler : TcpHandlerBase
     {
+        //private UserClient client;
+
+        internal event ConnectionFailedEventHandler ConnectionFailed;
+
         public UserClientTcpHandler() : base()
         {
-            
+            //this.client = client;
         }
-        public void Connect(string host, int port)
+        internal void Connect(IPAddress address, int port)
         {
             socket = new TcpClient
             {
@@ -18,7 +23,18 @@ namespace SimpleNetworking
                 SendBufferSize = DataBufferSize
             };
 
-            socket.BeginConnect(host, port, ConnectCallback, null);
+            try
+            {
+                socket.BeginConnect(address, port, ConnectCallback, null);
+            }
+            catch (Exception e)
+            {
+                ConnectionFailed?.Invoke(e, ProtocolType.Tcp);
+            }
+
+
+            
+            
         }
         
     }
