@@ -4,5 +4,8 @@ using System.Text;
 
 namespace SimpleNetworking
 {
-    
+    public enum ReserverdPacketIds
+    {
+        ClientIdSetter = 777
+    }
 }

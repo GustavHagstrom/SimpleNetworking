@@ -40,11 +40,11 @@ namespace SimpleNetworking.Tests.Helpers
             Receive();
         }
 
-        public void ServerSend(byte[] data, string address, int port)
-        {
-            var ep = new IPEndPoint(IPAddress.Parse(address), port);
-            _socket.Send(data, data.Length, ep);
-        }
+        //public void ServerSend(byte[] data, string address, int port)
+        //{
+        //    var ep = new IPEndPoint(IPAddress.Parse(address), port);
+        //    _socket.Send(data, data.Length, ep);
+        //}
         public void Send(byte[] data)
         {
             //byte[] data = Encoding.ASCII.GetBytes(text);
