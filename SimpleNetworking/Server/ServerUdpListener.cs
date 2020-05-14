@@ -35,7 +35,7 @@ namespace SimpleNetworking.Server
 
                 Receive();
 
-                PacketReceived(this, new Packet { AllBytes = data });
+                PacketReceived(this, new Packet { Bytes = data });
             }, null);
         }
     }

@@ -28,7 +28,7 @@ namespace SimpleNetworking.Tests.Tests
 
             Thread.Sleep(4 * 1000);
 
-            Packet sendPacket = new Packet { Data = Encoding.UTF8.GetBytes("Hello?") };
+            Packet sendPacket = new ExamplePacket { DataString = "Hello?" };
             userClient.Send(sendPacket, ProtocolType.Tcp);
             userClient.Send(sendPacket, ProtocolType.Udp);
             userClient.Send(sendPacket, ProtocolType.Udp);

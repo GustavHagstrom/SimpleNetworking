@@ -75,7 +75,7 @@ namespace SimpleNetworking.User
         {
             if(packet.PacketTypeId == (int)ReserverdPacketIds.ClientIdSetter)
             {
-                HandshakeReceived(new ConnectionHandshakePacket { AllBytes = packet.AllBytes });
+                HandshakeReceived(new ConnectionHandshakePacket { Bytes = packet.Bytes });
             }
             else
             {

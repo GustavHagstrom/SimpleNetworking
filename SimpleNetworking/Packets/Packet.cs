@@ -106,7 +106,7 @@ namespace SimpleNetworking
         //    }
         //}
 
-        public byte[] Data
+        protected byte[] Data
         {
             get
             {
@@ -115,10 +115,10 @@ namespace SimpleNetworking
             set
             {
                 data = value;
-                PacketLength = AllBytes.Length;
+                PacketLength = Bytes.Length;
             }
         }
-        public byte[] AllBytes
+        public byte[] Bytes
         {
             get
             {
@@ -136,7 +136,7 @@ namespace SimpleNetworking
         }
         public Packet()
         {
-            PacketLength = AllBytes.Length;
+            PacketLength = Bytes.Length;
             //data = new List<byte>();
         }
 

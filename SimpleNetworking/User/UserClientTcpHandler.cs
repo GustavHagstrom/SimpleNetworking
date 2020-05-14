@@ -43,7 +43,7 @@ namespace SimpleNetworking.User
         }
         public void Send(Packet packet)
         {
-            client.GetStream().Write(packet.AllBytes, 0, packet.PacketLength);
+            client.GetStream().Write(packet.Bytes, 0, packet.PacketLength);
             Thread.Sleep(1);
         }
         private void Receive()
@@ -81,7 +81,7 @@ namespace SimpleNetworking.User
 
             Packet packet = new Packet
             {
-                AllBytes = receivedUnhandledBytes.Take(packetLength).ToArray(),
+                Bytes = receivedUnhandledBytes.Take(packetLength).ToArray(),
             };
             receivedUnhandledBytes.RemoveRange(0, packetLength);
             return packet;

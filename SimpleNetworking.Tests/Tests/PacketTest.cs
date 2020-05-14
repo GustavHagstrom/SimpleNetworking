@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleNetworking.Tests.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
@@ -12,31 +13,31 @@ namespace SimpleNetworking.Tests.Tests
         {
             int expectedPacketId = 1;
             int expectedClientId = 11;
-            byte[] expectedData = BitConverter.GetBytes(255);
+            string expectedDataString = "Hello!";
 
-            Packet firstPacket = new Packet
+            ExamplePacket firstPacket = new ExamplePacket
             {
                 ClientId = expectedClientId,
                 PacketTypeId = expectedPacketId,
-                Data = expectedData
+                DataString = expectedDataString
 
             };
-            Packet secondPacket = new Packet();
-            secondPacket.AllBytes = firstPacket.AllBytes;
-            int expectedPacketLength = firstPacket.AllBytes.Length;
+            ExamplePacket secondPacket = new ExamplePacket();
+            secondPacket.Bytes = firstPacket.Bytes;
+            int expectedPacketLength = firstPacket.Bytes.Length;
 
-            Assert.Equal(expectedData, firstPacket.Data);
+            Assert.Equal(expectedDataString, firstPacket.DataString);
             Assert.Equal(expectedPacketId, firstPacket.PacketTypeId);
             Assert.Equal(expectedClientId, firstPacket.ClientId);
-            Assert.Equal(expectedPacketLength, firstPacket.AllBytes.Length);
+            Assert.Equal(expectedPacketLength, firstPacket.Bytes.Length);
 
-            Assert.Equal(expectedData, secondPacket.Data);
+            Assert.Equal(expectedDataString, secondPacket.DataString);
             Assert.Equal(expectedPacketId, secondPacket.PacketTypeId);
             Assert.Equal(expectedClientId, secondPacket.ClientId);
-            Assert.Equal(expectedPacketLength, secondPacket.AllBytes.Length);
+            Assert.Equal(expectedPacketLength, secondPacket.Bytes.Length);
 
-            Assert.Equal(firstPacket.PacketLength, firstPacket.AllBytes.Length);
-            Assert.Equal(secondPacket.PacketLength, secondPacket.AllBytes.Length);
+            Assert.Equal(firstPacket.PacketLength, firstPacket.Bytes.Length);
+            Assert.Equal(secondPacket.PacketLength, secondPacket.Bytes.Length);
         }
 
     }

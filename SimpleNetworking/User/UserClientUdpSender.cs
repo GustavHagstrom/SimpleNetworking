@@ -17,7 +17,7 @@ namespace SimpleNetworking.User
 
         public void Send(Packet packet, IPAddress iPAddress, int port)
         {
-            client.Send(packet.AllBytes, packet.PacketLength, new IPEndPoint(iPAddress, port));
+            client.Send(packet.Bytes, packet.PacketLength, new IPEndPoint(iPAddress, port));
         }
     }
 }

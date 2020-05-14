@@ -22,7 +22,7 @@ namespace SimpleNetworking.Server
         {
             try
             {
-                client.GetStream().Write(packet.AllBytes);
+                client.GetStream().Write(packet.Bytes);
                 Thread.Sleep(1);
             }
             catch (Exception e)
@@ -88,7 +88,7 @@ namespace SimpleNetworking.Server
 
             Packet packet = new Packet
             {
-                AllBytes = receivedUnhandledBytes.Take(packetLength).ToArray(),
+                Bytes = receivedUnhandledBytes.Take(packetLength).ToArray(),
             };
             receivedUnhandledBytes.RemoveRange(0, packetLength);
             return packet;
