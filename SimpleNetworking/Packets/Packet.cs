@@ -15,8 +15,14 @@ namespace SimpleNetworking
         {
             get
             {
+                
                 int offset = 0;
                 int length = 4;
+                int value = BitConverter.ToInt32(headers.Skip(offset).Take(length).ToArray());
+                if(value == 0)
+                {
+                    return HEADERSOFFSET;
+                }
                 return BitConverter.ToInt32(headers.Skip(offset).Take(length).ToArray());
             }
             private set
@@ -134,10 +140,10 @@ namespace SimpleNetworking
                 this.Data = value.Skip(HEADERSOFFSET).ToArray();
             }
         }
+
         public Packet()
         {
-            PacketLength = Bytes.Length;
-            //data = new List<byte>();
+            //PacketLength = Bytes.Length;
         }
 
 

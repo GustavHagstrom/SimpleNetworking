@@ -14,6 +14,8 @@ namespace SimpleNetworking.Tests.Tests
             int expectedPacketId = 1;
             int expectedClientId = 11;
             string expectedDataString = "Hello!";
+            Packet emptyPacket = new Packet();
+
 
             ExamplePacket firstPacket = new ExamplePacket
             {
@@ -38,6 +40,8 @@ namespace SimpleNetworking.Tests.Tests
 
             Assert.Equal(firstPacket.PacketLength, firstPacket.Bytes.Length);
             Assert.Equal(secondPacket.PacketLength, secondPacket.Bytes.Length);
+
+            Assert.Equal(Packet.HEADERSOFFSET, emptyPacket.PacketLength);
         }
 
     }
