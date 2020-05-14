@@ -5,12 +5,12 @@ using System.Net.Sockets;
 
 namespace SimpleNetworking.Server
 {
-    public class ServerTcpListener
+    public class ServerConnectionListener
     {
         private TcpListener tcpListener;
 
         public event EventHandler<TcpClient> ClientConnecting;
-        public ServerTcpListener()
+        public ServerConnectionListener()
         {
 
         }
@@ -22,7 +22,7 @@ namespace SimpleNetworking.Server
             tcpListener = new TcpListener(listeningPoint);
             tcpListener.Start();
 
-            Debugger.Log(1, null, $"{nameof(ServerTcpListener)}: Listening for connections on {IPAddress.Parse(((IPEndPoint)tcpListener.LocalEndpoint).Address.ToString())} on port {((IPEndPoint)tcpListener.LocalEndpoint).Port}\n");
+            Debugger.Log(1, null, $"{nameof(ServerConnectionListener)}: Listening for connections on {IPAddress.Parse(((IPEndPoint)tcpListener.LocalEndpoint).Address.ToString())} on port {((IPEndPoint)tcpListener.LocalEndpoint).Port}\n");
 
             tcpListener.BeginAcceptTcpClient(new AsyncCallback(ConnectionCallback), null);
         }

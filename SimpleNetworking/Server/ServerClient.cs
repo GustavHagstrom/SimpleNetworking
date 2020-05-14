@@ -1,4 +1,5 @@
 ﻿using SimpleNetworking.Tools;
+using SimpleNetworking.Common;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -9,7 +10,7 @@ namespace SimpleNetworking.Server
     public class ServerClient : IDisposable
     {
         private ServerClientTcpHandler tcp = new ServerClientTcpHandler();
-        private ServerClientUdpSender udp = new ServerClientUdpSender();
+        private UdpSender udpSender = new UdpSender();
 
         public ServerClient()
         {
@@ -18,7 +19,7 @@ namespace SimpleNetworking.Server
         }
 
         public int Id { get; set; } = 0;
-        public int Port { get; set; }
+        //public int Port { get; set; }
         public bool IsConnected
         {
             get
@@ -44,7 +45,6 @@ namespace SimpleNetworking.Server
         public void Disconnect()
         {
             Dispose();
-            Disconnected?.Invoke(this, new DisconnectedEventArgs(null, Id));
         }
         public void Send(Packet packet, ProtocolType type)
         {
@@ -59,7 +59,7 @@ namespace SimpleNetworking.Server
                     tcp.Send(packet);
                     break;
                 case ProtocolType.Udp:
-                    udp.Send(packet, ConnectedRemoteEndPoint.Address, ConnectedRemoteEndPoint.Port);
+                    udpSender.Send(packet, ConnectedRemoteEndPoint.Address, ConnectedRemoteEndPoint.Port);
                     break;
                 default:
                     throw new Exception($"ProtocolType {type.ToString()} is not supported");
@@ -68,7 +68,7 @@ namespace SimpleNetworking.Server
         protected virtual void OnDisconnected(object sender, DisconnectedEventArgs args)
         {
             Dispose();
-            Disconnected?.Invoke(this, args);
+            Disconnected?.Invoke(this, new DisconnectedEventArgs(args.Error, this.Id));
         }
         protected virtual void OnPacketReceived(object sender, Packet packet)
         {
@@ -76,7 +76,16 @@ namespace SimpleNetworking.Server
         }
         public void Dispose()
         {
-            tcp.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+            if(disposing)
+            {
+                tcp.Dispose();
+            }
+                
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SimpleNetworking.Packets;
+﻿using SimpleNetworking.Common;
+using SimpleNetworking.Packets;
 using SimpleNetworking.Tools;
 using System;
 using System.Collections.Generic;
@@ -12,8 +13,8 @@ namespace SimpleNetworking.Server
 
     public class SimpleServer
     {
-        private ServerTcpListener tcpListener;
-        private ServerUdpListener udpListener;
+        private ServerConnectionListener connectionListener;
+        private UdpListener udpListener;
 
         public event EventHandler<DisconnectedEventArgs> ClientDisconnected;
         public event EventHandler<ServerClient> ClientAccepted;
@@ -36,18 +37,18 @@ namespace SimpleNetworking.Server
             MaxConnections = maxConnections;
             Port = port;
 
-            udpListener = new ServerUdpListener();
-            tcpListener = new ServerTcpListener();
+            udpListener = new UdpListener();
+            connectionListener = new ServerConnectionListener();
 
             udpListener.PacketReceived += OnPacketReceived;
-            tcpListener.ClientConnecting += OnClientConnecting;
+            connectionListener.ClientConnecting += OnClientConnecting;
 
-            tcpListener.Start(Port);
-            udpListener.Start(Port);
+            connectionListener.Start(Port);
+            udpListener.Start(IPAddress.Any, Port);
         }
         public void Stop()
         {
-            tcpListener.Stop();
+            connectionListener.Stop();
             udpListener.Stop();
         }
         private void AddClient(TcpClient tcpClient)
@@ -78,14 +79,14 @@ namespace SimpleNetworking.Server
             ServerClient client = new ServerClient
             {
                 Id = id,
-                Port = this.Port,
+                //Port = this.Port,
             };
             client.PacketReceived += OnPacketReceived;
             client.Disconnected += OnClientDisconnected;
             
             return client;
         }
-        private void RemoveClient(int clientId)
+        public void RemoveClient(int clientId)
         {
             ServerClient client = Clients[clientId];
             client.Dispose();
@@ -106,7 +107,6 @@ namespace SimpleNetworking.Server
             {
                 ReceivedPackets.Enqueue(packet);
             }
-            
         }
         private void OnClientDisconnected(object sender, DisconnectedEventArgs args)
         {

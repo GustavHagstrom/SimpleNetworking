@@ -1,19 +1,18 @@
-﻿using SimpleNetworking.Packets;
+﻿using SimpleNetworking.Common;
+using SimpleNetworking.Packets;
 using SimpleNetworking.Tools;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace SimpleNetworking.User
 {
-    public class UserClient
+    public class UserClient : IDisposable
     {
         private UserClientTcpHandler tcp = new UserClientTcpHandler();
-        private UserClientUdpListener udpListener = new UserClientUdpListener();
-        private UserClientUdpSender udpSender = new UserClientUdpSender();
+        private UdpListener udpListener = new UdpListener();
+        private UdpSender udpSender = new UdpSender();
 
         public UserClient()
         {
@@ -21,6 +20,7 @@ namespace SimpleNetworking.User
 
             tcp.PacketReceived += OnPacketReceived;
             tcp.ConnectionSucceded += OnConnectionSucceded;
+            tcp.Disconnected += OnDisconnected;
         }
         public int Id { get; private set; } = 0;
         public bool IsConnected { get => tcp.client.Connected; }
@@ -28,7 +28,10 @@ namespace SimpleNetworking.User
         public int LocalPort { get => ((IPEndPoint)tcp.client.Client.LocalEndPoint).Port; }
         public IPAddress ConnectedIPAddress { get; private set; }
         public Queue<Packet> ReceivedPackets { get; private set; } = new Queue<Packet>();
+
         public event EventHandler<bool> ConnectionSucceded;
+        public event EventHandler<DisconnectedEventArgs> Disconnected;
+
         public void Connect(IPAddress address, int port)
         {
             ConnectedIPAddress = address;
@@ -82,10 +85,29 @@ namespace SimpleNetworking.User
                 ReceivedPackets.Enqueue(packet);
             }
         }
+        private void OnDisconnected(object sender, DisconnectedEventArgs args)
+        {
+            Dispose();
+            Disconnected?.Invoke(this, new DisconnectedEventArgs(args.Error, this.Id));
+        }
         private void HandshakeReceived(ConnectionHandshakePacket packet)
         {
             this.Id = packet.ServerAssignedId;
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                tcp.Dispose();
+                udpListener.Stop();
+            }
+
+        }
     }
 }

@@ -2,6 +2,7 @@
 using SimpleNetworking.Tests.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -37,13 +38,27 @@ namespace SimpleNetworking.Tests.Tests
             server.Clients[userClient.Id].Send(sendPacket, ProtocolType.Tcp);
             server.Clients[userClient.Id].Send(sendPacket, ProtocolType.Udp);
             server.Clients[userClient.Id].Send(sendPacket, ProtocolType.Udp);
-            server.Clients[userClient.Id].Send(sendPacket, ProtocolType.Udp);
 
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+            for (int i = 0; i < 2000; i++)
+            {
+                server.Clients[userClient.Id].Send(sendPacket, ProtocolType.Udp);
+            }
+            timer.Stop();
+            timer.Reset();
+            timer.Start();
+            for(int i = 0; i < 2000; i++)
+            {
+                userClient.Send(sendPacket, ProtocolType.Tcp);
+            }
+            timer.Stop();
+            server.Clients[userClient.Id].Disconnect();
 
             Thread.Sleep(10);
 
-            Assert.True(server.ReceivedPackets.Count == 4);
-            Assert.True(userClient.ReceivedPackets.Count == 4);
+            Assert.Equal(2000 + 4, server.ReceivedPackets.Count);
+            Assert.Equal(2000 + 3, userClient.ReceivedPackets.Count);
             Assert.True(userClient.Id != 0);
         }
         

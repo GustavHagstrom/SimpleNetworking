@@ -3,22 +3,22 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 
-namespace SimpleNetworking.Server
+namespace SimpleNetworking.Common
 {
-    public class ServerUdpListener
+    public class UdpListener
     {
         private UdpClient udpListener;
         private IPEndPoint endPoint;
 
 
         public event EventHandler<Packet> PacketReceived;
-        public ServerUdpListener()
+        public UdpListener()
         {
 
         }
-        public void Start(int port)
+        public void Start(IPAddress address, int port)
         {
-            endPoint = new IPEndPoint(IPAddress.Any, port);
+            endPoint = new IPEndPoint(address, port);
             udpListener = new UdpClient(endPoint);
             Receive();
         }
@@ -28,7 +28,7 @@ namespace SimpleNetworking.Server
         }
         private void Receive()
         {
-            Debugger.Log(1, null, $"{nameof(ServerUdpListener)}: Receiving udp packets from any IP address on port: {endPoint.Port}.\n");
+            Debugger.Log(1, null, $"{nameof(UdpListener)}: Receiving udp packets from any IP address on port: {endPoint.Port}.\n");
             udpListener.BeginReceive((ar) =>
             {
                 byte[] data = udpListener.EndReceive(ar, ref endPoint);
