@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace SimpleNetworking
 {
 
-    public class Packet : IPacket
+    public class Packet
     {
         public const int HEADERSOFFSET = 4 + 4 + 4;
 

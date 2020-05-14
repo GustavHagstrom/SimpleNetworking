@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SimpleNetworking
+﻿namespace SimpleNetworking.Tools
 {
     public enum ReserverdPacketIds
     {

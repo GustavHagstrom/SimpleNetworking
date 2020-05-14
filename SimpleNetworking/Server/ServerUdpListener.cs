@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace SimpleNetworking.Server
 {
@@ -22,8 +20,6 @@ namespace SimpleNetworking.Server
         {
             endPoint = new IPEndPoint(IPAddress.Any, port);
             udpListener = new UdpClient(endPoint);
-            //udpListener.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.ReuseAddress, true);
-            //udpListener.Client.Bind(endPoint);
             Receive();
         }
         public void Stop()
@@ -32,9 +28,6 @@ namespace SimpleNetworking.Server
         }
         private void Receive()
         {
-            //byte [] data = udpListener.Receive(ref endPoint);
-            //PacketReceived(this, new Packet { AllBytes = data });
-
             Debugger.Log(1, null, $"{nameof(ServerUdpListener)}: Receiving udp packets from any IP address on port: {endPoint.Port}.\n");
             udpListener.BeginReceive((ar) =>
             {

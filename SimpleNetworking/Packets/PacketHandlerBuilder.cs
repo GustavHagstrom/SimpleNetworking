@@ -3,7 +3,7 @@
 namespace SimpleNetworking
 {
 
-    public class PacketHandlerBuilder : IPacketHandlerBuilder
+    public class PacketHandlerBuilder
     {
         private Dictionary<int, PacketHandlerMethod> handlerMap;
         public PacketHandlerBuilder()

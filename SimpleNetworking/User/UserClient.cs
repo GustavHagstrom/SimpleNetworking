@@ -24,7 +24,7 @@ namespace SimpleNetworking.User
         }
         public int Id { get; private set; } = 0;
         public bool IsConnected { get => tcp.client.Connected; }
-        public int RemotePort { get; set; }
+        public int RemotePort { get; private set; }
         public int LocalPort { get => ((IPEndPoint)tcp.client.Client.LocalEndPoint).Port; }
         public IPAddress ConnectedIPAddress { get; private set; }
         public Queue<Packet> ReceivedPackets { get; private set; } = new Queue<Packet>();
