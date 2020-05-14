@@ -71,47 +71,6 @@ namespace SimpleNetworking
                 }
             }
         }
-        //public DateTime Sent
-        //{
-        //    get
-        //    {
-        //        int offset = 4 + 4 + 4;
-        //        int length = 8;
-        //        byte[] bytes = headers.Skip(offset).Take(length).ToArray();
-        //        long serializedDateTime = BitConverter.ToInt64(bytes);
-        //        return DateTime.FromBinary(serializedDateTime);
-        //    }
-        //    set
-        //    {
-        //        int offset = 4 + 4 + 4;
-        //        byte[] newBytes = BitConverter.GetBytes(value.ToBinary());
-        //        for (int i = 0; i < newBytes.Length; i++)
-        //        {
-        //            headers[i + offset] = newBytes[i];
-        //        }
-        //    }
-        //}
-        //public DateTime Received
-        //{
-        //    get
-        //    {
-        //        int offset = 4 + 4 + 4 + 8;
-        //        int length = 8;
-        //        byte[] bytes = headers.Skip(offset).Take(length).ToArray();
-        //        long serializedDateTime = BitConverter.ToInt64(bytes);
-        //        return DateTime.FromBinary(serializedDateTime);
-        //    }
-        //    set
-        //    {
-        //        int offset = 4 + 4 + 4 + 8;
-        //        byte[] newBytes = BitConverter.GetBytes(value.ToBinary());
-        //        for (int i = 0; i < newBytes.Length; i++)
-        //        {
-        //            headers[i + offset] = newBytes[i];
-        //        }
-        //    }
-        //}
-
         protected byte[] Data
         {
             get
@@ -143,7 +102,7 @@ namespace SimpleNetworking
 
         public Packet()
         {
-            //PacketLength = Bytes.Length;
+            
         }
 
 

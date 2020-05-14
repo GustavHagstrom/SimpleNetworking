@@ -5,7 +5,7 @@
     <Authors>Gustav Hagström</Authors>
     <Company />
     <Description>Easy setup for Server and Client connections with Tcp.</Description>
-    <Version>0.2.4.0</Version>
+    <Version>0.2.4.1</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>SimpleTcpUdpNetworking</PackageId>
     <Product>SimpleTcpUdpNetworking</Product>
