@@ -1,4 +1,5 @@
 ﻿using SimpleNetworking.Packets;
+using SimpleNetworking.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,6 @@ namespace SimpleNetworking.User
         private UserClientUdpListener udpListener = new UserClientUdpListener();
         private UserClientUdpSender udpSender = new UserClientUdpSender();
 
-        //private UserClientUdpHandler udp = new UserClientUdpHandler();
         public UserClient()
         {
             udpListener.PacketReceived += OnPacketReceived;
@@ -34,7 +34,6 @@ namespace SimpleNetworking.User
             ConnectedIPAddress = address;
             RemotePort = port;
             tcp.Connect(address, RemotePort);
-            //udp.Connect(address, 0);
         }
         public void Disconnect()
         {

@@ -16,7 +16,8 @@ namespace SimpleNetworking.Server
         private ServerUdpListener udpListener;
 
         public event EventHandler<DisconnectedEventArgs> ClientDisconnected;
-        public event ConnectedEventHandler ClientConnected;
+        public event EventHandler<ServerClient> ClientAccepted;
+        public event EventHandler ServerCapacityReached;
 
         public int MaxConnections { get; private set; }
         public int Port { get; private set; }
@@ -61,6 +62,7 @@ namespace SimpleNetworking.Server
             }
             Clients[calculatedId].SetConnection(tcpClient);
             SendServerAssignedId(calculatedId);
+            ClientAccepted?.Invoke(this, Clients[calculatedId]);
         }
         private void SendServerAssignedId(int clientId)
         {
@@ -93,6 +95,7 @@ namespace SimpleNetworking.Server
         {
             if (Clients.Count >= MaxConnections)
             {
+                ServerCapacityReached?.Invoke(this, EventArgs.Empty);
                 return;
             }
             AddClient(tcpClient);

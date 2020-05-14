@@ -2,15 +2,15 @@
 
 namespace SimpleNetworking
 {
-    public delegate void PacketHandlerMethod(IPacket packet, int clientId);
-    public class PacketHandler : IPacketHandler
+    public delegate void PacketHandlerMethod(Packet packet, int clientId);
+    public class PacketHandler
     {
         private Dictionary<int, PacketHandlerMethod> handlerMap;
         internal PacketHandler(Dictionary<int, PacketHandlerMethod> handlerMap)
         {
             this.handlerMap = handlerMap;
         }
-        public void HandlePacket(IPacket packet, int clientId)
+        public void HandlePacket(Packet packet, int clientId)
         {
             handlerMap[packet.PacketTypeId](packet, clientId);
         }
