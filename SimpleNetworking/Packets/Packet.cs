@@ -4,7 +4,7 @@ using System.Linq;
 namespace SimpleNetworking
 {
 
-    public class Packet
+    public sealed class Packet
     {
         public const int HEADERSOFFSET = 4 + 4 + 4;
 
@@ -71,7 +71,7 @@ namespace SimpleNetworking
                 }
             }
         }
-        protected byte[] Data
+        public byte[] Data
         {
             get
             {

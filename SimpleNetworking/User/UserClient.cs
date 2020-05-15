@@ -68,11 +68,11 @@ namespace SimpleNetworking.User
         }
         private void OnConnectionSucceded(object sender, bool succeded)
         {
-            ConnectionSucceded?.Invoke(this, succeded);
-            if(succeded)
+            if(succeded == false)
             {
-                udpListener.Start(ConnectedIPAddress, LocalPort);
+                ConnectionSucceded?.Invoke(this, succeded);
             }
+            //Waiting for Handshake to get ClientId ConnectionSecceded handled in HandshakeReceived
         }
         private void OnPacketReceived(object sender, Packet packet)
         {
@@ -93,6 +93,7 @@ namespace SimpleNetworking.User
         private void HandshakeReceived(ConnectionHandshakePacket packet)
         {
             this.Id = packet.ServerAssignedId;
+            ConnectionSucceded?.Invoke(this, true);
         }
 
         public void Dispose()
