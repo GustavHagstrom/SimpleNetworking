@@ -3,8 +3,10 @@ using SimpleNetworking.Packets;
 using SimpleNetworking.Tools;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace SimpleNetworking.User
 {
@@ -13,6 +15,7 @@ namespace SimpleNetworking.User
         private UserClientTcpHandler tcp = new UserClientTcpHandler();
         private UdpListener udpListener = new UdpListener();
         private UdpSender udpSender = new UdpSender();
+        private PacketHandler reserverPacketsHandler;
 
         public UserClient()
         {
@@ -21,6 +24,16 @@ namespace SimpleNetworking.User
             tcp.PacketReceived += OnPacketReceived;
             tcp.ConnectionSucceded += OnConnectionSucceded;
             tcp.Disconnected += OnDisconnected;
+        }
+        private void InitPacketHandler()
+        {
+            PacketHandlerBuilder builder = new PacketHandlerBuilder();
+            builder.RegisterHandlerMethod((int)ReserverdPacketIds.ClientIdSetter, (packet) =>
+            {
+                ConnectionHandshakePacket handshakePacket = new ConnectionHandshakePacket { Bytes = packet.Bytes };
+                this.Id = handshakePacket.ServerAssignedId;
+                ConnectionSucceded?.Invoke(this, true);
+            });
         }
         public int Id { get; private set; } = 0;
         public bool IsConnected { get => tcp.client.Connected; }
@@ -38,9 +51,16 @@ namespace SimpleNetworking.User
             RemotePort = port;
             tcp.Connect(address, RemotePort);
         }
+        public async Task ConnectAsync(IPAddress address, int port)
+        {
+            ConnectedIPAddress = address;
+            RemotePort = port;
+            await tcp.ConnectAsync(address, RemotePort);
+        }
         public void Disconnect()
         {
-            tcp.Dispose();
+            if(tcp != null)
+                tcp.Dispose();
         }
         public void Send(Packet packet, ProtocolType type)
         {
@@ -76,9 +96,10 @@ namespace SimpleNetworking.User
         }
         private void OnPacketReceived(object sender, Packet packet)
         {
-            if(packet.PacketTypeId == (int)ReserverdPacketIds.ClientIdSetter)
+            IEnumerable<ReserverdPacketIds> reservedIds = Enum.GetValues(typeof(ReserverdPacketIds)).Cast<ReserverdPacketIds>();
+            if (reservedIds.Contains((ReserverdPacketIds)packet.PacketTypeId)) // == (int)ReserverdPacketIds.ClientIdSetter)
             {
-                HandshakeReceived(new ConnectionHandshakePacket { Bytes = packet.Bytes });
+                reserverPacketsHandler.HandlePacket(packet);
             }
             else
             {
@@ -90,11 +111,7 @@ namespace SimpleNetworking.User
             Dispose();
             Disconnected?.Invoke(this, new DisconnectedEventArgs(args.Error, this.Id));
         }
-        private void HandshakeReceived(ConnectionHandshakePacket packet)
-        {
-            this.Id = packet.ServerAssignedId;
-            ConnectionSucceded?.Invoke(this, true);
-        }
+        
 
         public void Dispose()
         {

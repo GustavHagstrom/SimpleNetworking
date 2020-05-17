@@ -4,7 +4,7 @@ using System.Linq;
 namespace SimpleNetworking
 {
 
-    public sealed class Packet
+    public class Packet
     {
         public const int HEADERSOFFSET = 4 + 4 + 4;
 
